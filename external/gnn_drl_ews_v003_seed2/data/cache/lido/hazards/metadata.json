@@ -1,0 +1,45 @@
+{
+  "source_archive": "lido_diga_faro.zip",
+  "station": "Diga Sud Lido",
+  "station_note": "Open-sea ISPRA tide gauge on the south breakwater of Bocca di Porto del Lido, Adriatic side. Distinct from the Faro Rocchetta lagoon-side station (south of Lido) — do not conflate. The 'faro' suffix in the source archive name refers to the lighthouse on the Diga Sud breakwater itself, not Faro Rocchetta.",
+  "approximate_position": {
+    "lat_N": 45.42,
+    "lon_E": 12.424
+  },
+  "inlet": "Bocca di Porto del Lido",
+  "exposure": "open-sea (Adriatic), pre-inlet",
+  "datum": "ZMPS (Zero Mareografico Punta della Salute, 1897)",
+  "datum_note": "PRESERVED. Source values are metres above ZMPS. Cache stores level_cm = level_m * 100. No vertical transform applied.",
+  "time": "ora_solare = fixed UTC+1, no DST. Timestamps naive.",
+  "files": {
+    "water_level_hourly": {
+      "rows": 347658,
+      "year_range": [
+        1983,
+        2025
+      ],
+      "level_cm_range": [
+        -87.0,
+        177.0
+      ]
+    },
+    "wind_hourly": {
+      "rows": 112179,
+      "year_range": [
+        2012,
+        2025
+      ]
+    },
+    "daily_extremes": {
+      "rows": 48990,
+      "year_range": [
+        1984,
+        2019
+      ]
+    }
+  },
+  "skipped_for_hourly": [
+    "lidoDS2018.csv",
+    "lidoDS2019.csv (min/max only)"
+  ]
+}

@@ -1,0 +1,55 @@
+[project]
+name = "coastal-emergency-agent"
+version = "0.1.0"
+description = "Orchestration agent for coastal emergency response — EGU 2026"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Marcello Sano", email = "marcellosano@gmail.com" },
+]
+dependencies = [
+    "torch>=2.5",
+    "apscheduler>=3.10",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "httpx>=0.27",
+    "anthropic>=0.40",
+    "openai>=1.50",
+    "pydantic-settings>=2.5",
+    "sqlite-vec>=0.1.6",
+    "numpy>=2.4.4",
+    "pyyaml>=6.0",
+    "jinja2>=3.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "ruff>=0.7",
+]
+# Live mode extras — required only on the droplet for real GAT inference
+# against real OSM/DEM/census/hazard cache. Tests stay offline; install
+# these on the droplet via `uv sync --extra dev --extra live`.
+live = [
+    "torch-geometric>=2.5",
+    "gymnasium>=0.29",
+    "osmnx>=1.9",
+    "geopandas>=0.14",
+    "rasterio>=1.3",
+    "scikit-learn>=1.4",
+    "pandas>=2.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["coastal_agent", "dashboard"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,99 @@
+scenario: lido_real
+seed: 2
+graph:
+  source: osm
+  node_counts:
+    residential: 15
+    road: 8
+    shelter: 3
+    depot: 2
+    hazard_zone: 2
+  features:
+    residential:
+    - elevation
+    - population
+    - vulnerable_pop
+    - water_level
+    - forecast_water_level
+    - evacuated
+    - exposure
+    - local_flood_threshold
+    road:
+    - elevation
+    - water_level
+    - flood_threshold
+    - passability
+    - blocked
+    shelter:
+    - elevation
+    - capacity
+    - occupancy
+    - accessible
+    - shelter_active
+    depot:
+    - resources
+    - available
+    hazard_zone:
+    - intensity
+    - type_id
+  cache_dir: data/cache/lido
+hazards:
+  source: real
+  T: 24
+  tide:
+    base_cm: 60.0
+    surge_amplitude_cm: 80.0
+    period_steps: 12
+    noise_cm: 5.0
+  wind_wave:
+    base_ms: 4.0
+    surge_amplitude_ms: 8.0
+    period_steps: 14
+    noise_ms: 1.0
+  cache_dir: data/cache/lido/hazards
+  mode: uniform
+  named_event: null
+  min_peak_cm: 100.0
+  include_wind: true
+  holdout_exclusions:
+    csv: data/eval/lido_holdout.csv
+    named_events:
+    - 2022-11-22 00:00
+    buffer_hours: 48
+thresholds:
+  alert_tide: 110.0
+  full_evac: 150.0
+  road_flood_default: 90.0
+  shelter_min_capacity: 1
+resources:
+  initial_budget: 5
+reward:
+  weights:
+    safety: 1.0
+    connectivity: 0.5
+    damage: 0.5
+    resource_cost: 0.1
+    compliance: 1.0
+plan:
+  path: plans/lido.yaml
+env:
+  episode_steps: 24
+policy:
+  encoder: gat
+  hidden_dim: 64
+  num_layers: 2
+training:
+  algorithm: ppo
+  total_timesteps: 100000
+  rollout_length: 256
+  minibatch_size: 64
+  epochs: 4
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_range: 0.2
+  lr: 0.0003
+demography:
+  source: census
+  cache_dir: data/cache/lido/census
+  vulnerable_definition: age_65_plus
+  fallback_total: 20000

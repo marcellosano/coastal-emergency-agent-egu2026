@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Brief — incident #{{ incident.id }} · tick {{ brief.tick }}{% endblock %}
+{% block content %}
+
+<div class="card">
+  <div class="row">
+    <span class="tag">incident #{{ incident.id }}</span>
+    <span class="tag">tick {{ brief.tick }}</span>
+    <span class="tag">{{ brief.composed_at }}</span>
+  </div>
+  <h2 style="margin: 0.4rem 0 0">{{ incident.case_study | upper }} brief</h2>
+</div>
+
+<div class="recommendation">
+  <div class="muted" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em;">Recommended action</div>
+  <div class="action">{{ rec.action_id }}</div>
+  <div class="conf">confidence: {{ rec.confidence_signal }}</div>
+</div>
+
+{% if forecast %}
+<div class="card">
+  <h3>Forecast at this tick</h3>
+  <dl class="kv">
+    <dt>Surge</dt><dd>{{ "%.1f"|format(forecast.surge_cm) }} cm</dd>
+    <dt>Wind</dt><dd>{{ "%.1f"|format(forecast.wind_ms) }} m/s</dd>
+    <dt>Wave</dt><dd>{{ "%.2f"|format(forecast.wave_m) }} m</dd>
+    <dt>Rain</dt><dd>{{ "%.1f"|format(forecast.rainfall_mm) }} mm</dd>
+  </dl>
+</div>
+{% endif %}
+
+{% if action_probs %}
+<div class="card">
+  <h3>Policy distribution</h3>
+  {% for label, p in action_probs %}
+  <div style="margin-bottom: 0.5rem;">
+    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+      <span style="font-family: ui-monospace, monospace;">{{ label }}</span>
+      <span class="muted">{{ "%.3f"|format(p) }}</span>
+    </div>
+    <div class="bar {{ 'crit' if loop.index0 >= 5 else '' }}"><span style="width: {{ (p*100)|round(1) }}%"></span></div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+  <h3>Rationale</h3>
+  <p style="margin: 0;">{{ rec.rationale }}</p>
+</div>
+
+{% if citations %}
+<div class="card">
+  <h3>Citations</h3>
+  {% for c in citations %}
+  <div class="cite">
+    <div class="src">{{ c.source_type }}</div>
+    <div class="ref">{{ c.ref }}</div>
+    {% if c.excerpt %}<div class="excerpt">{{ c.excerpt }}</div>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if precondition_check %}
+<div class="card">
+  <h3>Precondition checks</h3>
+  {% for pc in precondition_check %}
+  <div class="pc {{ 'yes' if pc.satisfied is true else ('no' if pc.satisfied is false else 'idk') }}">
+    <div class="dot"></div>
+    <div class="body">
+      <div class="cond">{{ pc.condition }}</div>
+      <div class="ev">{{ pc.evidence }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if concerns %}
+<div class="card">
+  <h3>Concerns</h3>
+  <ul class="list">
+    {% for c in concerns %}<li>{{ c }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if open_questions %}
+<div class="card">
+  <h3>Open questions for the operator</h3>
+  <ul class="list">
+    {% for q in open_questions %}<li>{{ q }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if tool_calls %}
+<div class="card">
+  <h3>Tool audit ({{ tool_calls|length }} call{{ "" if tool_calls|length==1 else "s" }})</h3>
+  {% for t in tool_calls %}
+  <div style="padding: 0.4rem 0; border-bottom: 1px solid var(--border);">
+    <div style="font-family: ui-monospace, monospace; font-size: 0.85rem; color: var(--link);">{{ t.name }}</div>
+    <div class="muted" style="font-size: 0.85rem;">{{ t.result_summary }}{% if t.latency_ms is not none %} · {{ t.latency_ms }} ms{% endif %}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<a class="btn" href="/incidents/{{ incident.id }}">← Back to incident</a>
+
+{% endblock %}

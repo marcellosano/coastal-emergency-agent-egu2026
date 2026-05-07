@@ -1,0 +1,177 @@
+# Lido plan-action YAML — PCE-grounded.
+#
+# Source: Piano Comunale di Protezione Civile, Comune di Venezia,
+#         Versione 1.0 — Settembre 2008 (coordinatore Lorenzo Furano).
+# Synthesis document: Active/Plans/Lido/PCE_Action_Set_Synthesis.md
+#
+# Every action carries a `source:` field with {document, section, page} for
+# the HITL explanation layer. Numerical tide thresholds are still parametric
+# (PCE §1.1 defers them to the 2002 Piano integrato alta marea); replace
+# them once that document and/or PGRA Allegato IV maps are available.
+
+plan: "Lido_PCE_v1_2008"
+
+hazards:
+  - id: tide                  # storm-surge water level (Adriatic side)
+    units: cm
+  - id: wind_wave             # wind / wave forcing — secondary
+    units: m/s
+
+global_features:
+  - forecast_tide
+  - storm_phase               # encodes Attenzione/Preallarme/Allarme/Rientro
+  - time_remaining            # h until predicted impact (PCE §4.1.5.6: 12-24 h)
+  - resource_budget
+
+# Numerical thresholds: PARAMETRIC — PCE does not provide tide cm values
+# for Lido (deferred to Piano integrato alta marea, deliberazione n. 129/2002).
+# Values below are reasonable Adriatic-side surge placeholders; update from
+# PGRA Allegato IV or the 2002 plan when available.
+thresholds:
+  alert_tide: 110.0           # PARAMETRIC; Sindaco issues alert (PCE §4.1.4.9)
+  full_evac:  150.0           # PARAMETRIC; cedimento difese a mare (PCE §4.1.5.7)
+
+# ---------------------------------------------------------------------------
+# Actions — 7 total. Every action is traceable to the PCE.
+# Compared to lido_placeholder.yaml: deploy_barrier renamed to deploy_sandbags
+# (PCE §4.1.4.8 sacchi di sabbia); reroute dropped (no PCE provision for
+# operational rerouting on Lido).
+# ---------------------------------------------------------------------------
+
+actions:
+
+  - id: monitor
+    description: "No-op / continue ARPAV + Centro Maree surveillance (Fase di Attenzione)"
+    preconditions: []
+    required_data: []
+    effect:
+      type: noop
+    latency: 0
+    cost: { resources: 0 }
+    source:
+      document: "PCE_Comune_Venezia_v1_2008"
+      sections: ["4.1.4.1", "4.1.5.5"]
+      pages: [37, 42]
+      authority: "Servizio Protezione Civile"
+
+  - id: issue_alert
+    description: "Issue public alert via radio/TV/SMS/sito comunale; activates COC implicitly"
+    preconditions:
+      - "global.forecast_tide >= threshold.alert_tide"
+    required_data:
+      - global.forecast_tide
+      - node.population
+    effect:
+      type: global_flag_set
+      target: preparedness
+      value: true
+    latency: 0
+    cost: { resources: 0 }
+    source:
+      document: "PCE_Comune_Venezia_v1_2008"
+      sections: ["4.1.4.9", "4.1.6.8", "4.2.3.2"]
+      pages: [41, 45]
+      authority: "Sindaco"
+
+  - id: deploy_sandbags
+    description: "Place sand-bag protection at exposed residential / road point (sacchi di sabbia)"
+    target_node_type: residential
+    preconditions:
+      - "global.resources >= 1"
+      - "node.exposure > 0"
+    required_data:
+      - node.exposure
+      - global.forecast_tide
+    effect:
+      type: node_attribute_set
+      target: local_flood_threshold
+      delta: 1.0
+    latency: 1
+    cost: { resources: 1 }
+    source:
+      document: "PCE_Comune_Venezia_v1_2008"
+      sections: ["4.1.4.8"]
+      pages: [40]
+      authority: "Servizio PC + Volontari"
+
+  - id: close_road
+    description: "Interdict access on flood-exposed road segment"
+    target_node_type: road
+    preconditions:
+      - "node.water_level >= node.flood_threshold"
+    required_data:
+      - node.water_level
+      - node.flood_threshold
+    effect:
+      type: edge_attribute_set
+      target: passability
+      value: 0.0
+    latency: 0
+    cost: { resources: 0 }
+    source:
+      document: "PCE_Comune_Venezia_v1_2008"
+      sections: ["4.1.4.9"]
+      pages: [41]
+      authority: "Polizia Locale + Forze dell'Ordine"
+
+  - id: open_shelter
+    description: "Activate area di accoglienza (Lido: Ospedale al Mare, palestre scolastiche)"
+    target_node_type: shelter
+    preconditions:
+      - "node.accessible == true"
+      - "node.capacity > 0"
+      - "global.resources >= 1"
+    required_data:
+      - node.capacity
+      - edge.passability
+    effect:
+      type: node_attribute_set
+      target: shelter_active
+      value: true
+    latency: 1
+    cost: { resources: 1 }
+    source:
+      document: "PCE_Comune_Venezia_v1_2008"
+      sections: ["5.3.2", "4.1.4.8"]
+      pages: [82, 40]
+      authority: "Servizio PC + Volontari"
+
+  - id: assisted_evacuation
+    description: "Evacuate residential node to shelter via ACTV / ditte di autotrasporto"
+    target_node_type: residential
+    preconditions:
+      - "node.evacuated == false"
+      - "exists path(node → shelter, passable)"
+      - "global.resources >= 1"
+    required_data:
+      - node.population
+      - graph.connectivity
+    effect:
+      type: node_attribute_set
+      target: evacuated
+      value: true
+    latency: 1
+    cost: { resources: 1 }
+    source:
+      document: "PCE_Comune_Venezia_v1_2008"
+      sections: ["4.2.3.1", "4.2.3.4"]
+      pages: [57]
+      authority: "Sindaco (order); ACTV + Polizia Locale (execution)"
+
+  - id: full_evacuation
+    description: "Order area-wide evacuation (cedimento difese a mare / forecast over full-evac threshold)"
+    preconditions:
+      - "global.forecast_tide >= threshold.full_evac"
+    required_data:
+      - global.forecast_tide
+    effect:
+      type: global_action
+      target: all_residential
+      value: evacuated
+    latency: 1
+    cost: { resources: 3 }
+    source:
+      document: "PCE_Comune_Venezia_v1_2008"
+      sections: ["4.2.3.1", "4.1.5.7"]
+      pages: [57, 42]
+      authority: "Sindaco"

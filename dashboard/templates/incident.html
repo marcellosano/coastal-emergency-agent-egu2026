@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Incident #{{ incident.id }} — Lido{% endblock %}
+{% block content %}
+
+<div class="banner {{ 'active' if incident.status=='active' else 'standby' }}">
+  <div class="label">Incident #{{ incident.id }} · {{ incident.case_study }}</div>
+  <div class="h">{{ "Active" if incident.status == "active" else "Closed" }}</div>
+  <dl class="kv" style="margin-top:0.6rem">
+    <dt>Opened</dt><dd>{{ incident.opened_at }}</dd>
+    {% if incident.closed_at %}<dt>Closed</dt><dd>{{ incident.closed_at }}</dd>{% endif %}
+    {% if trigger %}<dt>Trigger</dt><dd>{{ trigger.summary }}</dd>{% endif %}
+  </dl>
+</div>
+
+<div class="card">
+  <h2>Timeline</h2>
+  {% if briefs %}
+    {% for b in briefs %}
+      <div style="padding: 0.7rem 0; border-bottom: 1px solid var(--border);">
+        <div class="row">
+          <span class="tag">tick {{ b.tick }}</span>
+          <span class="muted">{{ b.composed_at }}</span>
+        </div>
+        <div style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 1.05rem; color: var(--accent);">
+          <a href="/incidents/{{ incident.id }}/briefs/{{ b.id }}">{{ b.action_id }}</a>
+        </div>
+        {% if b.confidence_signal %}<div class="muted" style="font-size:0.85rem">confidence: {{ b.confidence_signal }}</div>{% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="muted">No briefs yet for this incident.</div>
+  {% endif %}
+</div>
+
+{% if emails %}
+<div class="card">
+  <h2>Emails sent</h2>
+  {% for e in emails %}
+    <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+      <div class="row">
+        <span class="tag {{ 'crit' if e.moment=='activation' else ('warn' if e.moment=='new_alert' else 'ok') }}">{{ e.moment }}</span>
+        <span class="tag">{{ e.mode }}</span>
+        {% if e.delivery_status %}<span class="tag">{{ e.delivery_status }}</span>{% endif %}
+      </div>
+      <div style="font-size:0.92rem">{{ e.subject }}</div>
+      <div class="muted" style="font-size:0.8rem">{{ e.sent_at }}</div>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<a class="btn" href="/">← Back to dashboard</a>
+
+{% endblock %}

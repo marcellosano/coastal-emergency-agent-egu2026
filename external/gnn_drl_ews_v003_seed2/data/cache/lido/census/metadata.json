@@ -1,0 +1,39 @@
+{
+  "source": {
+    "geometry": {
+      "document": "ISTAT Basi Territoriali 2021 (definitivi)",
+      "layer": "Sezioni di censimento \u2014 Veneto (R05)",
+      "crs": "EPSG:32632",
+      "url": "https://www.istat.it/storage/cartografia/basi_territoriali/2021/R05_21.zip",
+      "authority": "Istituto Nazionale di Statistica"
+    },
+    "variables": {
+      "document": "Censimento Permanente Popolazione 2021 \u2014 dati per sezione",
+      "reference_date": "2021-12-31",
+      "url": "https://esploradati.istat.it/databrowser/DWL/PERMPOP/SUBCOM/Dati_regionali_2021.zip",
+      "authority": "Istituto Nazionale di Statistica"
+    },
+    "license": "CC-BY 3.0 IT (ISTAT)"
+  },
+  "scope": {
+    "comune": "Venezia",
+    "pro_com_code": 27042,
+    "clip_boundary": "C:\\Users\\msano\\Projects\\gnn_drl_ews\\data\\cache\\lido\\boundary.gpkg",
+    "lido_area_km2": 8.078049634577527
+  },
+  "sezioni_count": 301,
+  "sezioni_missing_variables": 84,
+  "totals": {
+    "pop_total_2021": 15774,
+    "pop_65plus_2021": 5246,
+    "share_65plus": 0.3325725878027133,
+    "families_FAM21": 8037,
+    "buildings_EDI21": 2046
+  },
+  "sezione_population_distribution": {
+    "mean": 52.40531561461794,
+    "median": 30.0,
+    "max": 407,
+    "p90": 148.0
+  }
+}

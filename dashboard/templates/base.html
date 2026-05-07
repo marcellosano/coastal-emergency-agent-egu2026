@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}Coastal Emergency Agent — Lido{% endblock %}</title>
+<style>
+:root {
+  --bg: #f7f9fb;
+  --surface: #ffffff;
+  --surface-2: #f1f4f7;
+  --border: #d8dfe6;
+  --fg: #1a2330;
+  --muted: #5a6f78;
+  --accent: #0a4f6b;
+  --ok: #2c8c5a;
+  --warn: #c97b3c;
+  --crit: #a73a3a;
+  --link: #0a4f6b;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.55;
+  font-size: 17px;
+  -webkit-text-size-adjust: 100%;
+}
+header.top {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0.9rem 1rem;
+  position: sticky; top: 0; z-index: 5;
+}
+header.top h1 {
+  font-size: 1.1rem; margin: 0; font-weight: 600;
+}
+header.top h1 a { color: var(--fg); text-decoration: none; }
+header.top .sub { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+main { max-width: 720px; margin: 0 auto; padding: 1rem; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.card h2, .card h3 { margin-top: 0; }
+.card h2 { font-size: 1.1rem; }
+.card h3 { font-size: 1rem; color: var(--muted); margin-bottom: 0.4rem; font-weight: 600; }
+.kv {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 0.9rem;
+  font-size: 0.95rem;
+}
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-variant-numeric: tabular-nums; }
+.banner {
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+}
+.banner.standby { background: #ecf6f0; border-color: #b8e0c5; }
+.banner.active  { background: #fdecea; border-color: #f4b6b0; }
+.banner .label { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.banner .h { font-size: 1.4rem; font-weight: 700; margin-top: 4px; }
+.banner.standby .h { color: var(--ok); }
+.banner.active .h { color: var(--crit); }
+.recommendation {
+  background: var(--surface-2);
+  border-left: 4px solid var(--accent);
+  padding: 0.9rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+.recommendation .action {
+  font-size: 1.4rem; font-weight: 700; color: var(--accent);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+.recommendation .conf { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+.list { padding-left: 1.2rem; margin: 0.4rem 0 0 0; }
+.list li { margin-bottom: 0.3rem; }
+.cite {
+  background: var(--surface-2);
+  border-radius: 6px;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.92rem;
+}
+.cite .src { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.cite .ref { font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--link); word-break: break-word; }
+.cite .excerpt { margin-top: 0.4rem; color: var(--fg); }
+.pc {
+  display: flex; gap: 0.6rem; align-items: flex-start;
+  padding: 0.4rem 0; border-bottom: 1px solid var(--border);
+}
+.pc:last-child { border-bottom: none; }
+.pc .dot { flex: 0 0 12px; width: 12px; height: 12px; border-radius: 50%; margin-top: 6px; }
+.pc.yes .dot { background: var(--ok); }
+.pc.no  .dot { background: var(--crit); }
+.pc.idk .dot { background: var(--muted); }
+.pc .body { flex: 1; }
+.pc .cond { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85rem; }
+.pc .ev { color: var(--muted); font-size: 0.88rem; margin-top: 2px; }
+a { color: var(--link); }
+.muted { color: var(--muted); }
+.tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  margin-right: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.tag.ok { color: var(--ok); }
+.tag.warn { color: var(--warn); }
+.tag.crit { color: var(--crit); }
+.tag.active { color: var(--crit); }
+.tag.closed { color: var(--ok); }
+.row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.4rem; }
+.btn {
+  display: inline-block; padding: 0.55rem 1rem;
+  background: var(--surface-2); color: var(--fg);
+  border: 1px solid var(--border); border-radius: 6px;
+  text-decoration: none; font-size: 0.92rem;
+}
+.btn:hover { background: var(--surface); }
+footer {
+  max-width: 720px; margin: 2rem auto 1rem; padding: 0 1rem;
+  color: var(--muted); font-size: 0.8rem;
+}
+.bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--accent); }
+.bar.crit > span { background: var(--crit); }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1><a href="/">Coastal Emergency Agent — Lido</a></h1>
+  <div class="sub">EGU 2026 · {{ heartbeat_at or "no heartbeat yet" }}</div>
+</header>
+<main>
+{% block content %}{% endblock %}
+</main>
+<footer>
+  <div>plan-grounded LLM briefs over real Open-Meteo + ISPRA + GAT-PPO inference</div>
+  <div>{{ git_sha or "" }}</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# Reserved for trained-model artefacts.
+# The vendored GAT-PPO checkpoint lives at
+#   external/gnn_drl_ews_v003_seed2/runs/seed-2/checkpoint.pt
+# When a new model is vendored, place its checkpoint here only if it's not
+# part of a vendored snapshot. Otherwise prefer external/<snapshot>/...

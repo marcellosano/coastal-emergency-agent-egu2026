@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if active_incident %}
+<div class="banner active">
+  <div class="label">Active incident</div>
+  <div class="h">Incident #{{ active_incident.id }} — {{ active_incident.case_study }}</div>
+  <div class="muted" style="margin-top:0.4rem">opened {{ active_incident.opened_at }}</div>
+  <div style="margin-top:0.6rem">
+    <a class="btn" href="/incidents/{{ active_incident.id }}">View full timeline →</a>
+  </div>
+</div>
+{% else %}
+<div class="banner standby">
+  <div class="label">System state</div>
+  <div class="h">Standby</div>
+  <div class="muted" style="margin-top:0.4rem">No active incident — surge below activation threshold.</div>
+</div>
+{% endif %}
+
+{% if latest_forecast %}
+<div class="card">
+  <h3>Latest forecast (Lido di Venezia)</h3>
+  <dl class="kv">
+    <dt>Surge</dt><dd>{{ "%.1f"|format(latest_forecast.surge_cm) }} cm</dd>
+    <dt>Wind</dt><dd>{{ "%.1f"|format(latest_forecast.wind_ms) }} m/s</dd>
+    <dt>Wave</dt><dd>{{ "%.2f"|format(latest_forecast.wave_m) }} m</dd>
+    <dt>Rain</dt><dd>{{ "%.1f"|format(latest_forecast.rainfall_mm) }} mm</dd>
+    <dt>Fetched</dt><dd class="muted">{{ latest_forecast.fetched_at }}</dd>
+  </dl>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>Incidents</h2>
+  {% if incidents %}
+    {% for inc in incidents %}
+      <div style="padding: 0.6rem 0; border-bottom: 1px solid var(--border);">
+        <div class="row">
+          <span class="tag {{ 'active' if inc.status=='active' else 'closed' }}">{{ inc.status }}</span>
+          <span class="muted">#{{ inc.id }} · {{ inc.case_study }}</span>
+        </div>
+        <div><a href="/incidents/{{ inc.id }}">{{ inc.opened_at }} → {{ inc.closed_at or "ongoing" }}</a></div>
+        {% if inc.brief_count %}<div class="muted" style="font-size:0.85rem">{{ inc.brief_count }} brief{{ "" if inc.brief_count==1 else "s" }} · {{ inc.email_count }} email{{ "" if inc.email_count==1 else "s" }}</div>{% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="muted">No incidents recorded yet — system in standby since startup.</div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Heartbeat</h3>
+  <dl class="kv">
+    <dt>Tick count</dt><dd>{{ heartbeat.tick_count if heartbeat else 0 }}</dd>
+    <dt>Last tick</dt><dd class="muted">{{ heartbeat.last_tick_at if heartbeat else "—" }}</dd>
+  </dl>
+</div>
+
+{% endblock %}

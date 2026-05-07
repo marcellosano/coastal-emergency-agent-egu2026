@@ -1,0 +1,19 @@
+[Unit]
+Description=Coastal Emergency Agent (daemon)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=coastal
+Group=coastal
+WorkingDirectory=/home/coastal/Coastal_Emergency_Agent_EGU26
+EnvironmentFile=/opt/coastal-agent.env
+ExecStart=/home/coastal/Coastal_Emergency_Agent_EGU26/.venv/bin/python -m coastal_agent.main
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

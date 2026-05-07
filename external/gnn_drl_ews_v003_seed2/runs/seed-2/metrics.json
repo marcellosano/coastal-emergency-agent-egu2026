@@ -1,0 +1,9 @@
+{
+  "seed": 2,
+  "total_timesteps": 500000,
+  "num_envs": 8,
+  "n_episodes": 20832,
+  "mean_episodic_return": -373.29135869000606,
+  "final_episodic_return": 11.700000000000001,
+  "wallclock_s": 4057.7619864940643
+}

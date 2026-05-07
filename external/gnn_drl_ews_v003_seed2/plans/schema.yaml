@@ -1,0 +1,39 @@
+# Plan-action YAML schema (informal). The plan loader validates that any
+# plan YAML conforms to this shape. Cowork will replace placeholder plans
+# with grounded versions for Lido (PCE) and Ballina (CZEAS).
+
+plan: <string, plan name and version>
+
+hazards:
+  - id: <string>            # e.g. tide, wind_wave, river_level
+    units: <string>         # e.g. cm, m/s, m
+
+global_features:            # global state vector slots
+  - <string>
+
+actions:
+  - id: <string, unique>
+    description: <string, optional>
+    target_node_type: <string, optional>   # if absent → global action
+    preconditions: [<string DSL expr>, ...]
+    required_data: [<string dotted ref>, ...]
+    effect:
+      type: <noop|global_flag_set|node_attribute_set|edge_attribute_set|global_action|routing_change>
+      target: <string, attribute or scope>
+      value: <scalar, optional>
+      delta: <scalar, optional>
+    latency: <int>          # steps before effect realises
+    cost:
+      resources: <int>      # currency in shared resource budget
+
+# Precondition DSL — minimal symbolic forms used by plan/mask.py:
+#   "global.<feature> >= threshold.<name>"
+#   "global.<feature> >= <number>"
+#   "node.<attr> >= node.<attr>"
+#   "node.<attr> == <bool>"
+#   "node.<attr> > <number>"
+#   "global.resources >= <int>"
+#   "exists path(node → shelter, passable)"
+#   "exists alternative passable edge"
+#
+# Anything more elaborate goes through plan/mask.py custom predicates.
